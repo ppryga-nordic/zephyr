@@ -322,6 +322,54 @@ void bt_ctlr_assert_handle(char *file, uint32_t line)
 	while (1) {
 	}
 }
+
+static void uart_send_reg(uint32_t reg)
+{
+	uart_poll_out(hci_uart_dev, reg >> 0 & 0xff);
+	uart_poll_out(hci_uart_dev, reg >> 8 & 0xff);
+	uart_poll_out(hci_uart_dev, reg >> 16 & 0xff);
+	uart_poll_out(hci_uart_dev, reg >> 24 & 0xff);
+}
+
+void k_sys_fatal_error_handler(unsigned int reason, const z_arch_esf_t *esf)
+{
+	/* Disable interrupts, this is unrecoverable */
+	(void)irq_lock();
+
+	if (esf != NULL) {
+		uart_irq_rx_disable(hci_uart_dev);
+		uart_irq_tx_disable(hci_uart_dev);
+
+		uart_poll_out(hci_uart_dev, H4_EVT);
+		/* Vendor-Specific debug event */
+		uart_poll_out(hci_uart_dev, 0xff);
+		/* 0xAA + r0/a1 + 0xAA + r1/a2 + 0xAA + r2/a3 + 0xAA + r3/a4 + 0xAA + r12/ip +
+		* 0xAA + r14/lp + 0xAA + XPSR */
+		uart_poll_out(hci_uart_dev, (1 + sizeof(uint32_t)) * 7);
+		uart_poll_out(hci_uart_dev, 0xAA);
+
+		uart_send_reg(esf->basic.a1);
+
+		uart_poll_out(hci_uart_dev, 0xAA);
+		uart_send_reg(esf->basic.a2);
+
+		uart_poll_out(hci_uart_dev, 0xAA);
+		uart_send_reg(esf->basic.a3);
+
+		uart_poll_out(hci_uart_dev, 0xAA);
+		uart_send_reg(esf->basic.a4);
+
+		uart_poll_out(hci_uart_dev, 0xAA);
+		uart_send_reg(esf->basic.ip);
+
+		uart_poll_out(hci_uart_dev, 0xAA);
+		uart_send_reg(esf->basic.lr);
+
+		uart_poll_out(hci_uart_dev, 0xAA);
+		uart_send_reg(esf->basic.xpsr);
+	}
+}
+
 #endif /* CONFIG_BT_CTLR_ASSERT_HANDLER */
 
 static int hci_uart_init(const struct device *unused)

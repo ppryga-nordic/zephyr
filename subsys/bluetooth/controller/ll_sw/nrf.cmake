@@ -64,7 +64,8 @@ if(CONFIG_BT_LL_SW_SPLIT)
     CONFIG_BT_CTLR_DF
     ll_sw/nordic/lll/lll_df.c
     )
-  if(CONFIG_BT_CTLR_DF AND NOT CONFIG_SOC_SERIES_BSIM_NRFXX)
+  #if(CONFIG_BT_CTLR_DF /*AND NOT CONFIG_SOC_SERIES_BSIM_NRFXX*/)
+  if(CONFIG_BT_CTLR_DF)
     zephyr_library_sources(ll_sw/nordic/hal/nrf5/radio/radio_df.c)
   endif()
   if(CONFIG_BT_CTLR_CONN_ISO)

@@ -12,6 +12,9 @@
  */
 #include <soc.h>
 
+#undef NRF_RADIO_SHORTS_PDU_END_DISABLE
+#define NRF_RADIO_SHORTS_PDU_END_DISABLE RADIO_SHORTS_PHYEND_DISABLE_Msk
+
 /* NRF Radio HW timing constants
  * - provided in US and NS (for higher granularity)
  * - based on empirical measurements and sniffer logs

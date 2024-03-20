@@ -45,7 +45,52 @@ cpuppr_vevif: &cpuppr_vevif_remote {};
 &gpiote130 {
 	interrupts = <105 NRF_DEFAULT_IRQ_PRIORITY>;
 };
-
 &grtc {
-	interrupts = <109 NRF_DEFAULT_IRQ_PRIORITY>;
+	owned-channels = <7 8 9 10 11 12 13 14>;
+	child-owned-channels = <8 9 10 11 12>; /* reserved channels for MPSL */
+	interrupts = <109 NRF_DEFAULT_IRQ_PRIORITY
+	              108 NRF_DEFAULT_IRQ_PRIORITY
+	              110 NRF_DEFAULT_IRQ_PRIORITY >; /* IRQ for exclusive use by MPSL */
+	nonsecure-channels = <8 9 10 11 12>;
+	status = "okay";
 };
+
+/* MPSL requires one global DPPI channel which is routed to the radiocore */
+&dppic130 {
+	compatible = "nordic,nrf-dppic-global";
+	owned-channels = <0>;
+	sink-channels = <0>;
+	nonsecure-channels = <0>;
+	status = "okay";
+};
+
+&dppic132 {
+	compatible = "nordic,nrf-dppic-global";
+	owned-channels = <0>;
+	source-channels = <0>;
+	nonsecure-channels = <0>;
+	status = "okay";
+};
+
+&ipct130 {
+	owned-channels = <0>;
+	source-channel-links = <0 3 0>;
+	status = "okay";
+};
+
+// &cpurad_spu000 {
+// 	status = "okay";
+// };
+
+// &cpurad_spu010 {
+// 	status = "okay";
+// };
+
+// &cpurad_spu020 {
+// /* Enabling this will crash Radiocore samples that use IPC (NCSDK-23108) */
+// 	status = "disabled";
+// };
+
+// &cpurad_spu030 {
+// 	status = "okay";
+// };

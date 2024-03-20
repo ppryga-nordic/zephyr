@@ -23,6 +23,7 @@
 		zephyr,code-partition = &cpurad_slot0_partition;
 		zephyr,flash = &mram1x;
 		zephyr,sram = &cpurad_ram0;
+		zephyr,entropy = &rng;
 	};
 };
 
@@ -68,7 +69,7 @@
 };
 
 &uart135 {
-	status = "okay";
+	/*status = "okay";*/
 	memory-regions = <&cpurad_dma_region>;
 	current-speed = <115200>;
 	pinctrl-0 = <&uart135_default>;

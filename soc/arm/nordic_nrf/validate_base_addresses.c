@@ -219,7 +219,12 @@ CHECK_DT_REG(qdec131, NRF_QDEC131);
 CHECK_DT_REG(radio, NRF_RADIO);
 CHECK_DT_REG(regulators, NRF_REGULATORS);
 CHECK_DT_REG(reset, NRF_RESET);
+#if defined(HALTIUM_XXAA) || defined(LUMOS_XXAA)
+/* The haltium platforms don't have NRF_RNG, we just pretend they do
+ * until PSA is available to provide entropy. NCSDK-13168. */
+#else
 CHECK_DT_REG(rng, NRF_RNG);
+#endif
 CHECK_DT_REG(rtc, NRF_RTC);
 CHECK_DT_REG(rtc0, NRF_RTC0);
 CHECK_DT_REG(rtc1, NRF_RTC1);

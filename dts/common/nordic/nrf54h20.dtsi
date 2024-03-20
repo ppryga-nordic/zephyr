@@ -945,4 +945,9 @@
 			#address-cells = <1>;
 		};
 	};
+
+	rng: rng {
+		compatible = "nordic,entropy-prng";
+		status = "okay";
+	};
 };

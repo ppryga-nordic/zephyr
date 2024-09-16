@@ -127,7 +127,7 @@ static void do_suspend_to_ram(void)
 	sys_resume();
 }
 #endif /* IS_ENABLED(CONFIG_PM_S2RAM) */
-
+bool pm_do_s2ram=false;
 void pm_state_set(enum pm_state state, uint8_t substate_id)
 {
 	if (state != PM_STATE_SUSPEND_TO_RAM) {
@@ -135,7 +135,10 @@ void pm_state_set(enum pm_state state, uint8_t substate_id)
 		return;
 	}
 #if IS_ENABLED(CONFIG_PM_S2RAM)
+	pm_do_s2ram = true;
+
 	do_suspend_to_ram();
+	pm_do_s2ram = false;
 #endif
 }
 

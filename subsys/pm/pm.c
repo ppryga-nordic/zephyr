@@ -165,6 +165,8 @@ bool pm_state_force(uint8_t cpu, const struct pm_state_info *info)
 	return true;
 }
 
+uint32_t pm_sched_locked;
+bool wait_sched = true;
 bool pm_system_suspend(int32_t ticks)
 {
 	uint8_t id = _current_cpu->id;
@@ -231,7 +233,14 @@ bool pm_system_suspend(int32_t ticks)
 	 * we lock the scheduler here and unlock just after we have
 	 * sent the notification in pm_system_resume().
 	 */
+#if !defined(CONFIG_BOARD_NRF54H20DK_NRF54H20_CPURAD)
+	if (pm_sched_locked == 0xFFFFFFFF)
+	{
+		while(wait_sched);
+	}
+#endif
 	k_sched_lock();
+	--pm_sched_locked;
 	pm_stats_start();
 	/* Enter power state */
 	pm_state_notify(true);
@@ -248,6 +257,7 @@ bool pm_system_suspend(int32_t ticks)
 	pm_stats_update(z_cpus_pm_state[id].state);
 	pm_system_resume();
 	k_sched_unlock();
+	++pm_sched_locked;
 	SYS_PORT_TRACING_FUNC_EXIT(pm, system_suspend, ticks,
 				   z_cpus_pm_state[id].state);
 
